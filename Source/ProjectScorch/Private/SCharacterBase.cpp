@@ -55,6 +55,16 @@ void ASCharacterBase::Tick(float DeltaTime)
 
 }
 
+FVector ASCharacterBase::GetPawnViewLocation() const
+{
+	if (Camera)
+	{
+		return Camera->GetComponentLocation();
+	}
+
+	return Super::GetPawnViewLocation();
+}
+
 // Called to bind functionality to input
 void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
