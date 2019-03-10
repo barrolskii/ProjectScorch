@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
+
 // Sets default values
 ASCharacterBase::ASCharacterBase()
 {

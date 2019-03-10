@@ -7,6 +7,13 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 
+static int32 DebugWeaponDrawing = 0;
+FAutoConsoleVariableRef CVARDebugWeaponDrawing(
+	TEXT("Scorch.DebugWeapons"),
+	DebugWeaponDrawing,
+	TEXT("Draws debug lines for weapons"),
+	ECVF_Cheat);
+
 // Sets default values
 ASWeaponBase::ASWeaponBase()
 {
@@ -69,8 +76,8 @@ void ASWeaponBase::Fire()
 			TracerEndPoint = HitData.ImpactPoint;
 		}
 
-
-		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
+		if (DebugWeaponDrawing > 0)
+			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Red, false, 1.0f, 0, 1.0f);
 
 		if (MuzzleEffect)
 		{
