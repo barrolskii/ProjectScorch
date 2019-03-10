@@ -35,10 +35,6 @@ void ASWeaponBase::Tick(float DeltaTime)
 
 void ASWeaponBase::Fire()
 {
-	// Trace a line from pawn eyes to the crosshair
-	UE_LOG(LogTemp, Log, TEXT("Fire function called"));
-
-
 	AActor *Owner = GetOwner();
 	if (Owner)
 	{
