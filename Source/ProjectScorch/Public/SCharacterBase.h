@@ -29,7 +29,8 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
-	void Fire();
+	void BeginFire();
+	void EndFire();
 
 	FORCEINLINE void BeginAimDownSights() { IsAimingDownSights = true; }
 	FORCEINLINE void EndAimDownSights() { IsAimingDownSights = false;  }

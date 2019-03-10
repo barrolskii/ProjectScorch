@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Classes/PhysicalMaterials/PhysicalMaterial.h"
+#include "TimerManager.h"
 #include "ProjectScorch.h"
 
 static int32 DebugWeaponDrawing = 0;
@@ -24,6 +25,28 @@ ASWeaponBase::ASWeaponBase()
 
 	MuzzleSocketName = "MuzzleSocket";
 	TracerTargetName = "Target";
+
+	BaseDamage = 20.0f;
+	FireRate = 600;
+}
+
+void ASWeaponBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TimeBetweenShots = 60 / FireRate;
+}
+
+void ASWeaponBase::BeginFire()
+{
+	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
+
+	GetWorldTimerManager().SetTimer(ShotTimer, this, &ASWeaponBase::Fire, TimeBetweenShots, true, FirstDelay);
+}
+
+void ASWeaponBase::EndFire()
+{
+	GetWorldTimerManager().ClearTimer(ShotTimer);
 }
 
 void ASWeaponBase::Fire()
@@ -53,10 +76,16 @@ void ASWeaponBase::Fire()
 			// Process what the line hit
 			AActor *HitActor = HitData.GetActor();
 
-			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, ShotDirection, HitData, Owner->GetInstigatorController(), this, DamageType);
+			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(HitData.PhysMaterial.Get());
+			
+			float AppliedDamage = BaseDamage;
+			if (SurfaceType == SURFACE_FLESH_VULNERABLE)
+			{
+				AppliedDamage *= 2.0f;
+			}
 
 			
-			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(HitData.PhysMaterial.Get());
+			UGameplayStatics::ApplyPointDamage(HitActor, AppliedDamage, ShotDirection, HitData, Owner->GetInstigatorController(), this, DamageType);
 
 			UParticleSystem *SelectedEffect = nullptr;
 			switch (SurfaceType)
@@ -94,6 +123,8 @@ void ASWeaponBase::Fire()
 				PC->ClientPlayCameraShake(FireCameraShake);
 			}
 		}
+
+		LastFireTime = GetWorld()->TimeSeconds;
 	}
 }
 

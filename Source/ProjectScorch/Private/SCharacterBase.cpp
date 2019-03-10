@@ -70,12 +70,18 @@ void ASCharacterBase::EndCrouch()
 	UnCrouch();
 }
 
-void ASCharacterBase::Fire()
+void ASCharacterBase::BeginFire()
 {
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->Fire();
+		CurrentWeapon->BeginFire();
 	}
+}
+
+void ASCharacterBase::EndFire()
+{
+	if (CurrentWeapon)
+		CurrentWeapon->EndFire();
 }
 
 // Called every frame
@@ -116,5 +122,7 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("AimDownSights", IE_Pressed, this, &ASCharacterBase::BeginAimDownSights);
 	PlayerInputComponent->BindAction("AimDownSights", IE_Released, this, &ASCharacterBase::EndAimDownSights);
-	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &ASCharacterBase::Fire);
+
+	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &ASCharacterBase::BeginFire);
+	PlayerInputComponent->BindAction("FireWeapon", IE_Released, this, &ASCharacterBase::EndFire);
 }

@@ -19,9 +19,10 @@ public:
 	// Sets default values for this actor's properties
 	ASWeaponBase();
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	virtual void Fire();
+	virtual void BeginPlay() override;
 
+	void BeginFire();
+	void EndFire();
 
 protected:
 
@@ -51,7 +52,21 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<UCameraShake> FireCameraShake;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float BaseDamage;
+
+	/* Value is set in RPM - rounds per minute */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float FireRate;
+
+	FTimerHandle ShotTimer;
+	float LastFireTime;
+
+	float TimeBetweenShots;
+
+	virtual void Fire();
+
 	void PlayMuzzleEffect();
 	void PlayTracerEffect(FVector *TracerEndPoint);
 };
