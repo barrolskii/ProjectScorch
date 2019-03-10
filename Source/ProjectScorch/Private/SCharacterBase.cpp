@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SCharacterBase.h"
+#include "SWeaponBase.h"
 #include "Classes/Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Classes/Engine/World.h"
+#include "Components/SkeletalMeshComponent.h"
 
 
 // Sets default values
@@ -24,6 +27,8 @@ ASCharacterBase::ASCharacterBase()
 	AimDownSightsFOV = 65.0f;
 	IsAimingDownSights = false;
 	ZoomInterpSpeed = 20.0f;
+
+	WeaponAttachSocketName = "WeaponSocket";
 }
 
 // Called when the game starts or when spawned
@@ -32,6 +37,17 @@ void ASCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	DefaultFOV = Camera->FieldOfView;
+
+	// Spawn a default weapon
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeaponBase>(StarterWeapon, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+	}
 }
 
 void ASCharacterBase::MoveForward(float value)
@@ -52,6 +68,14 @@ void ASCharacterBase::BeginCrouch()
 void ASCharacterBase::EndCrouch()
 {
 	UnCrouch();
+}
+
+void ASCharacterBase::Fire()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Fire();
+	}
 }
 
 // Called every frame
@@ -92,5 +116,6 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("AimDownSights", IE_Pressed, this, &ASCharacterBase::BeginAimDownSights);
 	PlayerInputComponent->BindAction("AimDownSights", IE_Released, this, &ASCharacterBase::EndAimDownSights);
+	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &ASCharacterBase::Fire);
 }
 

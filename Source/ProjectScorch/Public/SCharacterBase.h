@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class ASWeaponBase;
 
 UCLASS()
 class PROJECTSCORCH_API ASCharacterBase : public ACharacter
@@ -28,6 +29,8 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
+	void Fire();
+
 	FORCEINLINE void BeginAimDownSights() { IsAimingDownSights = true; }
 	FORCEINLINE void EndAimDownSights() { IsAimingDownSights = false;  }
 
@@ -46,6 +49,14 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player", Meta = (ClampMin = 0.1, ClampMax = 100))
 	float ZoomInterpSpeed;
+
+	ASWeaponBase *CurrentWeapon;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<ASWeaponBase> StarterWeapon;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	FName WeaponAttachSocketName;
 
 public:	
 	// Called every frame
