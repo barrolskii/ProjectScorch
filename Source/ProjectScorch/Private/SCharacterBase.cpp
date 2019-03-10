@@ -118,4 +118,3 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("AimDownSights", IE_Released, this, &ASCharacterBase::EndAimDownSights);
 	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &ASCharacterBase::Fire);
 }
-

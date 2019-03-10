@@ -67,8 +67,15 @@ void ASWeaponBase::Fire()
 		PlayMuzzleEffect();
 		PlayTracerEffect(&TracerEndPoint);
 
-
-
+		APawn *POwner = Cast<APawn>(GetOwner());
+		if (POwner)
+		{
+			APlayerController *PC = Cast<APlayerController>(POwner->GetController());
+			if (PC)
+			{
+				PC->ClientPlayCameraShake(FireCameraShake);
+			}
+		}
 	}
 }
 
