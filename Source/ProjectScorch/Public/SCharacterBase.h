@@ -28,12 +28,24 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
+	FORCEINLINE void BeginAimDownSights() { IsAimingDownSights = true; }
+	FORCEINLINE void EndAimDownSights() { IsAimingDownSights = false;  }
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	UCameraComponent *Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USpringArmComponent *SpringArm;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float AimDownSightsFOV;
+	
+	float DefaultFOV;
+	
+	bool IsAimingDownSights;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player", Meta = (ClampMin = 0.1, ClampMax = 100))
+	float ZoomInterpSpeed;
 
 public:	
 	// Called every frame

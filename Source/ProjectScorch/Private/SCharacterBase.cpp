@@ -19,13 +19,18 @@ ASCharacterBase::ASCharacterBase()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	AimDownSightsFOV = 65.0f;
+	IsAimingDownSights = false;
+	ZoomInterpSpeed = 20.0f;
 }
 
 // Called when the game starts or when spawned
 void ASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	DefaultFOV = Camera->FieldOfView;
 }
 
 void ASCharacterBase::MoveForward(float value)
@@ -53,6 +58,10 @@ void ASCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float TargetFOV = IsAimingDownSights ? AimDownSightsFOV : DefaultFOV;
+	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
+
+	Camera->SetFieldOfView(NewFOV);
 }
 
 FVector ASCharacterBase::GetPawnViewLocation() const
@@ -79,5 +88,8 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASCharacterBase::BeginCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASCharacterBase::EndCrouch);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+
+	PlayerInputComponent->BindAction("AimDownSights", IE_Pressed, this, &ASCharacterBase::BeginAimDownSights);
+	PlayerInputComponent->BindAction("AimDownSights", IE_Released, this, &ASCharacterBase::EndAimDownSights);
 }
 
