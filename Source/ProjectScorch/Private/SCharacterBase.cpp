@@ -10,7 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "ProjectScorch.h"
 #include "SHealthComponent.h"
-
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASCharacterBase::ASCharacterBase()
@@ -44,19 +44,21 @@ void ASCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	DefaultFOV = Camera->FieldOfView;
-
-	// Spawn a default weapon
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	CurrentWeapon = GetWorld()->SpawnActor<ASWeaponBase>(StarterWeapon, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
-	if (CurrentWeapon)
-	{
-		CurrentWeapon->SetOwner(this);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
-	}
-
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASCharacterBase::OnHealthChanged);
+
+	if (Role == ROLE_Authority)
+	{
+		// Spawn a default weapon
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeaponBase>(StarterWeapon, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (CurrentWeapon)
+		{
+			CurrentWeapon->SetOwner(this);
+			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+		}
+	}
 }
 
 void ASCharacterBase::MoveForward(float value)
@@ -152,4 +154,12 @@ void ASCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &ASCharacterBase::BeginFire);
 	PlayerInputComponent->BindAction("FireWeapon", IE_Released, this, &ASCharacterBase::EndFire);
+}
+
+/* Specify what and how we want to replicate objects for multiplayer */
+void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASCharacterBase, CurrentWeapon);
 }

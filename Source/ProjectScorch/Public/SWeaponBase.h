@@ -10,6 +10,21 @@ class USkeletalMeshComponent;
 class UDamageType;
 class UParticleSystem;
 
+// Contains information of a single hitscan weapon line trace
+USTRUCT()
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	TEnumAsByte<EPhysicalSurface> SurfaceType;
+
+	UPROPERTY()
+	FVector_NetQuantize TraceTo;
+};
+
 UCLASS()
 class PROJECTSCORCH_API ASWeaponBase : public AActor
 {
@@ -65,8 +80,20 @@ protected:
 
 	float TimeBetweenShots;
 
+	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
+	FHitScanTrace HitScanTrace;
+
+	UFUNCTION()
+	void OnRep_HitScanTrace();
+
+	/* Marked virtual so other inheriting weapon classes can have their own fire types */
 	virtual void Fire();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
 
 	void PlayMuzzleEffect();
 	void PlayTracerEffect(FVector *TracerEndPoint);
+
+	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint);
 };

@@ -58,6 +58,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player", Meta = (ClampMin = 0.1, ClampMax = 100))
 	float ZoomInterpSpeed;
 
+	UPROPERTY(Replicated)
 	ASWeaponBase *CurrentWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
