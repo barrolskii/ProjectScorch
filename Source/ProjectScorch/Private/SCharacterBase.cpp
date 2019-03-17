@@ -93,7 +93,7 @@ void ASCharacterBase::EndFire()
 		CurrentWeapon->EndFire();
 }
 
-void ASCharacterBase::OnHealthChanged(USHealthComponent* HealthComp, float Health, 
+void ASCharacterBase::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, 
 									  float HealthDelta, const class UDamageType* DamageType, 
 									  class AController* InstigatedBy, AActor* DamageCauser)
 {

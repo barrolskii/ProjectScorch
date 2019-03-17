@@ -34,7 +34,7 @@ protected:
 	void EndFire();
 
 	UFUNCTION()
-	void OnHealthChanged(USHealthComponent* HealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	FORCEINLINE void BeginAimDownSights() { IsAimingDownSights = true; }
 	FORCEINLINE void EndAimDownSights() { IsAimingDownSights = false;  }
@@ -45,6 +45,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USpringArmComponent *SpringArm;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USHealthComponent *HealthComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
