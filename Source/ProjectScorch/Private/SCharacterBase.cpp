@@ -9,6 +9,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "ProjectScorch.h"
+#include "SHealthComponent.h"
 
 
 // Sets default values
@@ -20,6 +21,9 @@ ASCharacterBase::ASCharacterBase()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->SetupAttachment(RootComponent);
+
+	HealthComp = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
+
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
@@ -51,6 +55,8 @@ void ASCharacterBase::BeginPlay()
 		CurrentWeapon->SetOwner(this);
 		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ASCharacterBase::OnHealthChanged);
 }
 
 void ASCharacterBase::MoveForward(float value)
@@ -85,6 +91,24 @@ void ASCharacterBase::EndFire()
 {
 	if (CurrentWeapon)
 		CurrentWeapon->EndFire();
+}
+
+void ASCharacterBase::OnHealthChanged(USHealthComponent* HealthComp, float Health, 
+									  float HealthDelta, const class UDamageType* DamageType, 
+									  class AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0.0f && !bDied)
+	{
+		// Kill the character
+		bDied = true;
+
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		DetachFromControllerPendingDestroy();
+
+		SetLifeSpan(10.0f);
+	}
 }
 
 // Called every frame

@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class ASWeaponBase;
+class USHealthComponent;
 
 UCLASS()
 class PROJECTSCORCH_API ASCharacterBase : public ACharacter
@@ -32,6 +33,9 @@ protected:
 	void BeginFire();
 	void EndFire();
 
+	UFUNCTION()
+	void OnHealthChanged(USHealthComponent* HealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
 	FORCEINLINE void BeginAimDownSights() { IsAimingDownSights = true; }
 	FORCEINLINE void EndAimDownSights() { IsAimingDownSights = false;  }
 
@@ -40,6 +44,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USpringArmComponent *SpringArm;
+
+	USHealthComponent *HealthComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	float AimDownSightsFOV;
@@ -58,6 +64,10 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponAttachSocketName;
+
+	/* Pawn died previously */
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bDied;
 
 public:	
 	// Called every frame
