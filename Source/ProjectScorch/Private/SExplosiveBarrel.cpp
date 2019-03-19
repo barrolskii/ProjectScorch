@@ -6,6 +6,7 @@
 #include "SHealthComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASExplosiveBarrel::ASExplosiveBarrel()
@@ -28,6 +29,9 @@ ASExplosiveBarrel::ASExplosiveBarrel()
 	ExplosionImpulse = 400;
 
 	IsDestroyed = false;
+
+	SetReplicates(true);
+	SetReplicateMovement(true);
 }
 
 void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, 
@@ -39,7 +43,10 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 	if (Health <= 0.0f)
 	{
 		IsDestroyed = true;
-		
+
+		/* Call client explode method */
+		OnRep_PlayEffect();
+
 		// Boost the barrel upwards
 		FVector BoostIntensity = FVector::UpVector * ExplosionImpulse;
 		MeshComp->AddImpulse(BoostIntensity, NAME_None, true);
@@ -50,4 +57,18 @@ void ASExplosiveBarrel::OnHealthChanged(USHealthComponent* OwningHealthComp, flo
 
 		RadialForceComp->FireImpulse();
 	}
+}
+
+void ASExplosiveBarrel::OnRep_PlayEffect()
+{
+	// Play the effect and change the actors material to the damaged material
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
+	MeshComp->SetMaterial(0, DestroyedMaterial);
+}
+
+void ASExplosiveBarrel::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASExplosiveBarrel, IsDestroyed);
 }

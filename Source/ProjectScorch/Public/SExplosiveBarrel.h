@@ -35,6 +35,14 @@ protected:
 	void OnHealthChanged(USHealthComponent* OwningHealthComp, float Health, float HealthDelta, 
 						 const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	UFUNCTION()
+	void OnRep_PlayEffect();
+
+	/* 
+	* Pass repicated value to server and use the OnRep_PlayEffect function to have the client
+	* play the effects of the barrel exploding	
+	*/
+	UPROPERTY(ReplicatedUsing = OnRep_PlayEffect)
 	bool IsDestroyed;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
